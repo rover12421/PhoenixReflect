@@ -11,13 +11,13 @@ object ReflectUtil {
     /**
      * 获取当前的 ClassLoad
      */
-    fun getCurrentClassLoad(): ClassLoader = Reflection.getCallerClass().classLoader
+    fun getDefaultClassLoad(): ClassLoader = Thread.currentThread().contextClassLoader
 
     /**
      * 加载 Class
      * == Class.fromName
      */
-    fun loadClass(clazzStr: String, initialize: Boolean = true, classLoader: ClassLoader = getCurrentClassLoad()) : Class<*> {
+    fun loadClass(clazzStr: String, initialize: Boolean = true, classLoader: ClassLoader = getDefaultClassLoad()) : Class<*> {
         try {
             return Class.forName(clazzStr, initialize, classLoader)
         } catch (e : Throwable) {

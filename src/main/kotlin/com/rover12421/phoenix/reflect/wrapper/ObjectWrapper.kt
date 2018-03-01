@@ -8,7 +8,7 @@ class ObjectWrapper private constructor(from: Any, fromClass: Class<*> = from::c
         fun fromObject(any: Any) = ObjectWrapper(any)
         fun fromClass(clazz: Class<*>) = ObjectWrapper(clazz, clazz)
         fun fromClassStr(clazzStr: String, initialize: Boolean = true,
-                         classLoader: ClassLoader = ReflectUtil.getCurrentClassLoad())
+                         classLoader: ClassLoader = ReflectUtil.getDefaultClassLoad())
                 : ObjectWrapper {
             val clazz = ReflectUtil.loadClass(clazzStr, initialize, classLoader)
             return ObjectWrapper(clazz, clazz)
