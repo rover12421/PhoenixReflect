@@ -7,8 +7,8 @@ import kotlin.reflect.KClass
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ReturnTypeByClass(val value: KClass<*>)
+annotation class EntryTypeByClass(val value: KClass<*>)
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ReturnTypeByString(val value: String)
+annotation class EntryTypeByString(val value: String)
