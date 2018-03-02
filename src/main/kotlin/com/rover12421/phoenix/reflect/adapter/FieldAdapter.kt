@@ -5,13 +5,13 @@ import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Field
 
 class FieldAdapter : BaseReflectAdapter() {
-    var name: MutableList<String> = mutableListOf()
-    var type: Class<*>? = null
-    var fromObject: Any? = null
-    var field: Field? = null
+    private val fieldNames: MutableList<String> = mutableListOf()
+    private var type: Class<*>? = null
+    private var fromObject: Any? = null
+    private var field: Field? = null
 
     fun name(vararg value: String) : FieldAdapter  {
-        name.addAll(value)
+        fieldNames.addAll(value)
         return this
     }
 
@@ -42,11 +42,9 @@ class FieldAdapter : BaseReflectAdapter() {
             fromClass.add(fromObject!!::class.java)
         }
 
-        if (name.isEmpty()) {
+        if (fieldNames.isEmpty()) {
             throw ReflectException("没有设置Field的名字")
         }
-
-        checkField()
     }
 
     private fun checkField() {
@@ -54,9 +52,11 @@ class FieldAdapter : BaseReflectAdapter() {
             return
         }
 
+        checkArgs()
+
         var exception: Throwable? = null
         fromClass.firstOrNull{ clazz ->
-            name.firstOrNull { fieldName ->
+            fieldNames.firstOrNull { fieldName ->
                 try {
                     field = ReflectUtil.findFieldInClass(clazz, fieldName, true, type)
                     true
@@ -72,11 +72,14 @@ class FieldAdapter : BaseReflectAdapter() {
         }
     }
 
-    fun setValue(value: Any?) : FieldAdapter {
-        checkArgs()
+    fun toField() : Field? {
+        checkField()
+        return field
+    }
 
+    fun setValue(value: Any?) : FieldAdapter {
         try {
-            field!!.set(fromObject, value)
+            toField()?.set(fromObject, value)
         } catch (e: Throwable) {
             exception(e)
         }
@@ -84,23 +87,22 @@ class FieldAdapter : BaseReflectAdapter() {
     }
 
     fun setValue(obj: Any, value: Any?) : FieldAdapter {
-        fromObject = obj
+        fromObject(obj)
         return setValue(value)
     }
 
-    fun <T> getValue() : T {
-        checkArgs()
+    fun getValue() : Any? {
         return try {
-            field!!.get(fromObject) as T
+            toField()?.get(fromObject)
         } catch (e: Throwable) {
             exception(e)
-            null as T
+            null
         }
     }
 
-    fun <T> getValue(obj: Any) : T {
-        fromObject = obj
-        return getValue() as T
+    fun getValue(obj: Any) : Any? {
+        fromObject(obj)
+        return getValue()
     }
 }
 

@@ -1,7 +1,5 @@
 package com.rover12421.phoenix.reflect.component.annotation
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import kotlin.reflect.KClass
 
 /**
@@ -11,7 +9,7 @@ import kotlin.reflect.KClass
  * field 上使用，忽略 class 上的注释
  */
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class FromClassByClass(vararg val value: KClass<*>)
 
 /**
@@ -21,5 +19,5 @@ annotation class FromClassByClass(vararg val value: KClass<*>)
  * field 上使用，忽略 class 上的注释
  */
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class FromClassByString(vararg val value: String)

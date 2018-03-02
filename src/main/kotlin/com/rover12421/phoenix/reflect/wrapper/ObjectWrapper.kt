@@ -31,7 +31,7 @@ class ObjectWrapper private constructor(from: Any, fromClass: Class<*> = from::c
         }
     }
 
-    fun <T : Any> constructor(parameterTypes: Array<Class<*>?>? = null, args: Array<Any?>? = null) : ConstructorWrapper<T> {
+    fun constructor(parameterTypes: Array<Class<*>?>? = null, args: Array<Any?>? = null) : ConstructorWrapper {
         try {
             return ConstructorWrapper(ReflectUtil.findConstructorInClass(fromClass, parameterTypes, args), from, fromClass)
         } catch (e: Throwable) {

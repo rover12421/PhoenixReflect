@@ -140,14 +140,14 @@ object ReflectUtil {
      * [parameterTypes] 参数类型数组
      * [args] 参数实例
      */
-    fun <T> findConstructorInClass(clazz: Class<*>, parameterTypes: Array<Class<*>?>? = null, args: Array<Any?>? = null) : Constructor<T> {
+    fun findConstructorInClass(clazz: Class<*>, parameterTypes: Array<Class<*>?>? = null, args: Array<Any?>? = null) : Constructor<*> {
         val constructors = clazz.declaredConstructors
         constructors.forEach { constructor ->
             if (
                     isMatchParameterTypes(constructor.parameterTypes, parameterTypes, args)
             ) {
                 constructor.isAccessible = true
-                return constructor as Constructor<T>
+                return constructor
             }
         }
 
@@ -173,9 +173,9 @@ object ReflectUtil {
     /**
      * 通过反射构建新的实例对象
      */
-    fun <T> newInstance(fromClass: Class<*>, args: Array<Any?>? = null, parameterTypes: Array<Class<*>?>? = null): T {
+    fun newInstance(fromClass: Class<*>, args: Array<Any?>? = null, parameterTypes: Array<Class<*>?>? = null): Any? {
         val invokeArgs = args?: emptyArray()
-        return findConstructorInClass<T>(fromClass, parameterTypes, args).newInstance(*invokeArgs)
+        return findConstructorInClass(fromClass, parameterTypes, args).newInstance(*invokeArgs)
     }
 
     fun getBooleanField(fromObj: Any, name: String, findInSpuer: Boolean = true, type: Class<*>? = null) : Boolean {

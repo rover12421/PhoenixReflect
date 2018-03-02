@@ -1,7 +1,5 @@
 package com.rover12421.phoenix.reflect.component.annotation
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import kotlin.reflect.KClass
 
 /**
@@ -9,7 +7,7 @@ import kotlin.reflect.KClass
  * 同时使用，只有 [MethodParamsByClass] 生效
  */
 @Target(AnnotationTarget.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class MethodParamsByClass(vararg val value: KClass<*>)
 
 /**
@@ -17,5 +15,5 @@ annotation class MethodParamsByClass(vararg val value: KClass<*>)
  * 同时使用，只有 [MethodParamsByClass] 生效
  */
 @Target(AnnotationTarget.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class MethodParamsByString(vararg val value: String)
