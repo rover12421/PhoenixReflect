@@ -9,6 +9,16 @@ class ConstructorAdapter : BaseReflectAdapter() {
 
     private var constructor: Constructor<*>? = null
 
+    fun parameterTypes(vararg cls: Class<*>?) : ConstructorAdapter {
+        parameterTypes.addAll(cls)
+        return this
+    }
+
+    fun invokeArgs(vararg args: Any?) : ConstructorAdapter {
+        invokeArgs.addAll(args)
+        return this
+    }
+
     override fun checkArgs() {
 
     }

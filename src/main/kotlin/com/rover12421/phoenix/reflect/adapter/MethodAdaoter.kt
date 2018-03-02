@@ -23,6 +23,16 @@ class MethodAdaoter : BaseReflectAdapter() {
         return this
     }
 
+    fun parameterTypes(vararg cls: Class<*>?) : MethodAdaoter {
+        parameterTypes.addAll(cls)
+        return this
+    }
+
+    fun invokeArgs(vararg args: Any?) : MethodAdaoter {
+        invokeArgs.addAll(args)
+        return this
+    }
+
     fun returnType(typeStr: String) : MethodAdaoter {
         try {
             returnType(ReflectUtil.loadClass(typeStr, true, classLoader))
