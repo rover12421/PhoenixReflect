@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class StaticFloatEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class StaticFloatEntry(field: Field): FieldEntry(field) {
     fun setValue(value: Float) {
-        fieldWrapper.setFloat(value)
+        field.setFloat(null, value)
     }
 
-    fun getValue() : Float = fieldWrapper.getFloat()
+    fun getValue() : Float = field.getFloat(null)
 }

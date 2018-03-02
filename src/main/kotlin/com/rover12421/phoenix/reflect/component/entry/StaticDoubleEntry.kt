@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class StaticDoubleEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class StaticDoubleEntry(field: Field): FieldEntry(field) {
     fun setValue(value: Double) {
-        fieldWrapper.setDouble(value)
+        field.setDouble(null, value)
     }
 
-    fun getValue() : Double = fieldWrapper.getDouble()
+    fun getValue() : Double = field.getDouble(null)
 }

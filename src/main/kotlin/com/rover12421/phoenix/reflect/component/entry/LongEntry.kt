@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class LongEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class LongEntry(field: Field): FieldEntry(field) {
     fun setValue(from: Any, value: Long) {
-        fieldWrapper.setLong(from, value)
+        field.setLong(from, value)
     }
 
-    fun getValue(from: Any) : Long = fieldWrapper.getLong(from)
+    fun getValue(from: Any) : Long = field.getLong(from)
 }

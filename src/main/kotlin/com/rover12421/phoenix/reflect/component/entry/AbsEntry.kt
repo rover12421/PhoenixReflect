@@ -1,5 +1,5 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.ReflectWrapper
+import java.lang.reflect.AccessibleObject
 
-abstract class AbsEntry<out T : ReflectWrapper>(open val from: T)
+abstract class AbsEntry<out T : AccessibleObject>(open val from: T)

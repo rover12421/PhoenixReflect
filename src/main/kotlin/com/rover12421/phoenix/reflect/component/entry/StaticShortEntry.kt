@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class StaticShortEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class StaticShortEntry(field: Field): FieldEntry(field) {
     fun setValue(value: Short) {
-        fieldWrapper.setShort(value)
+        field.setShort(null, value)
     }
 
-    fun getValue() : Short = fieldWrapper.getShort()
+    fun getValue() : Short = field.getShort(null)
 }

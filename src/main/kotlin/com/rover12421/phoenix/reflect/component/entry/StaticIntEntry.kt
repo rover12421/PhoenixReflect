@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class StaticIntEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class StaticIntEntry(field: Field): FieldEntry(field) {
     fun setValue(value: Int) {
-        fieldWrapper.setInt(value)
+        field.setInt(null, value)
     }
 
-    fun getValue() : Int = fieldWrapper.getInt()
+    fun getValue() : Int = field.getInt(null)
 }

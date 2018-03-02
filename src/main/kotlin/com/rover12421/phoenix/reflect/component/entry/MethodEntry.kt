@@ -1,9 +1,9 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.MethodWrapper
+import java.lang.reflect.Method
 
-class MethodEntry(override val from: MethodWrapper) : AbsEntry<MethodWrapper>(from) {
+class MethodEntry(override val from: Method) : AbsEntry<Method>(from) {
     fun invoke(obj: Any, vararg args: Any?) : Any? {
-        return from.invoke(obj, args)
+        return from.invoke(obj, *args)
     }
 }

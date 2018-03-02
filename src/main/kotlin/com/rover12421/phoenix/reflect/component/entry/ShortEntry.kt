@@ -1,11 +1,11 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.FieldWrapper
+import java.lang.reflect.Field
 
-class ShortEntry(fieldWrapper: FieldWrapper): FieldEntry(fieldWrapper) {
+class ShortEntry(field: Field): FieldEntry(field) {
     fun setValue(from: Any, value: Short) {
-        fieldWrapper.setShort(from, value)
+        field.setShort(from, value)
     }
 
-    fun getValue(from: Any) : Short = fieldWrapper.getShort(from)
+    fun getValue(from: Any) : Short = field.getShort(from)
 }

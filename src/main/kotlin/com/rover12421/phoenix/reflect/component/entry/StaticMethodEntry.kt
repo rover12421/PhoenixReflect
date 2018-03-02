@@ -1,9 +1,9 @@
 package com.rover12421.phoenix.reflect.component.entry
 
-import com.rover12421.phoenix.reflect.wrapper.MethodWrapper
+import java.lang.reflect.Method
 
-class StaticMethodEntry(@JvmField val methodWrapper: MethodWrapper) {
+class StaticMethodEntry(@JvmField val method: Method) {
     fun invoke(vararg args: Any?) : Any? {
-        return methodWrapper.invoke(args)
+        return method.invoke(null, *args)
     }
 }
