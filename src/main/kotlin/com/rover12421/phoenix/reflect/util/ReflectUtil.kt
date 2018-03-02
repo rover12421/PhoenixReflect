@@ -11,15 +11,23 @@ object ReflectUtil {
     /**
      * 获取当前的 ClassLoad
      */
-    fun getDefaultClassLoad(): ClassLoader = Thread.currentThread().contextClassLoader
+    @JvmField val DefaultClassLoad: ClassLoader = Thread.currentThread().contextClassLoader
 
     /**
      * 加载 Class
      * == Class.fromName
      */
-    fun loadClass(clazzStr: String, initialize: Boolean = true, classLoader: ClassLoader = getDefaultClassLoad()) : Class<*> {
+    fun loadClass(clazzStr: String, initialize: Boolean = true, classLoader: ClassLoader = DefaultClassLoad) : Class<*> {
         try {
             return Class.forName(clazzStr, initialize, classLoader)
+        } catch (e : Throwable) {
+            throw ReflectException(e)
+        }
+    }
+
+    fun loadClass(clazzStr: String, classLoader: ClassLoader) : Class<*> {
+        try {
+            return Class.forName(clazzStr, true, classLoader)
         } catch (e : Throwable) {
             throw ReflectException(e)
         }

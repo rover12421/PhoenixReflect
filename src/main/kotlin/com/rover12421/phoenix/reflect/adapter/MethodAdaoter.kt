@@ -35,7 +35,7 @@ class MethodAdaoter : BaseReflectAdapter() {
 
     fun returnType(typeStr: String) : MethodAdaoter {
         try {
-            returnType(ReflectUtil.loadClass(typeStr, true, classLoader))
+            returnType(ReflectUtil.loadClass(typeStr, classLoader))
         } catch (e: Throwable) {
             exception(e)
         }

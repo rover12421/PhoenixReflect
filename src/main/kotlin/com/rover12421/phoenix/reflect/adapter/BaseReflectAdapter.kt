@@ -5,7 +5,7 @@ import com.rover12421.phoenix.reflect.util.ReflectUtil
 abstract class BaseReflectAdapter {
     @JvmField var fromClass: MutableList<Class<*>> = mutableListOf()
     @JvmField var catchException: Boolean = true
-    @JvmField var classLoader: ClassLoader = ReflectUtil.getDefaultClassLoad()
+    @JvmField var classLoader: ClassLoader = ReflectUtil.DefaultClassLoad
 
     fun classLoader(cl: ClassLoader) : BaseReflectAdapter {
         classLoader = cl
@@ -15,7 +15,7 @@ abstract class BaseReflectAdapter {
     fun fromClass(vararg classStr: String) : BaseReflectAdapter {
         classStr.forEach {
             try {
-                fromClass.add(ReflectUtil.loadClass(it, true, classLoader))
+                fromClass.add(ReflectUtil.loadClass(it, classLoader))
             } catch (_: Throwable){}
         }
 

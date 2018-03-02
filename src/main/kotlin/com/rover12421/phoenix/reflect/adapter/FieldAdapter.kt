@@ -22,7 +22,7 @@ class FieldAdapter : BaseReflectAdapter() {
 
     fun type(typeStr: String) : FieldAdapter {
         try {
-            type(ReflectUtil.loadClass(typeStr, true, classLoader))
+            type(ReflectUtil.loadClass(typeStr, classLoader))
         } catch (e: Throwable) {
             exception(e)
         }
