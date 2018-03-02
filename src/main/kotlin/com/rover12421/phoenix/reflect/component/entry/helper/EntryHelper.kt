@@ -26,5 +26,5 @@ object EntryHelper {
             StaticMethodEntry::class.java
     )
 
-    private val EntryConstructor = AllEntryClass.associateBy({it}, {it.constructors[0]})
+    @JvmField val EntryConstructor = AllEntryClass.associateBy({it}, {it.constructors[0]})
 }

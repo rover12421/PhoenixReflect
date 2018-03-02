@@ -2,7 +2,7 @@ package com.rover12421.phoenix.reflect.wrapper
 
 import java.lang.reflect.Field
 
-class FieldWrapper(val field: Field, from: Any, fromClass: Class<*> = from::class.java) : ReflectWrapper(from, fromClass) {
+class FieldWrapper(@JvmField val field: Field, from: Any, fromClass: Class<*> = from::class.java) : ReflectWrapper(from, fromClass) {
     fun getValueWrapper(any: Any = from) = ObjectWrapper.fromObject(getValue(any))
 
     fun getValue    (any: Any = from)      = field.get(any)

@@ -2,7 +2,7 @@ package com.rover12421.phoenix.reflect.wrapper
 
 import java.lang.reflect.Method
 
-class MethodWrapper(val method: Method, from: Any, fromClass: Class<*> = from::class.java) : ReflectWrapper(from, fromClass) {
+class MethodWrapper(@JvmField val method: Method, from: Any, fromClass: Class<*> = from::class.java) : ReflectWrapper(from, fromClass) {
     fun invoke(any: Any, vararg args: Any?) : Any? {
         return method.invoke(any, args)
     }

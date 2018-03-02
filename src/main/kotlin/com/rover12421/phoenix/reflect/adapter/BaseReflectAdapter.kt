@@ -3,9 +3,9 @@ package com.rover12421.phoenix.reflect.adapter
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 
 abstract class BaseReflectAdapter {
-    var fromClass: MutableList<Class<*>> = mutableListOf()
-    var catchException: Boolean = true
-    var classLoader: ClassLoader = ReflectUtil.getDefaultClassLoad()
+    @JvmField var fromClass: MutableList<Class<*>> = mutableListOf()
+    @JvmField var catchException: Boolean = true
+    @JvmField var classLoader: ClassLoader = ReflectUtil.getDefaultClassLoad()
 
     fun classLoader(cl: ClassLoader) : BaseReflectAdapter {
         classLoader = cl
