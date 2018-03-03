@@ -50,6 +50,7 @@ abstract class BaseReflectComponent {
                     }
                     else -> null
                 }
+                field.isAccessible = true
                 field.set(this, obj)
             }
         }
