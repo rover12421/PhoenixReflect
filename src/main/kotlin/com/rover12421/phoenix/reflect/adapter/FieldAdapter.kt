@@ -15,7 +15,7 @@ class FieldAdapter : BaseReflectAdapter() {
         return this
     }
 
-    fun type(t: Class<*>) : FieldAdapter {
+    fun type(t: Class<*>?) : FieldAdapter {
         type = t
         return this
     }

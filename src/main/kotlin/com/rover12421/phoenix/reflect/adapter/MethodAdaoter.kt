@@ -18,7 +18,7 @@ class MethodAdaoter : BaseReflectAdapter() {
         return this
     }
 
-    fun returnType(t: Class<*>) : MethodAdaoter {
+    fun returnType(t: Class<*>?) : MethodAdaoter {
         returnType = t
         return this
     }
