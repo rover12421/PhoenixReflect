@@ -87,7 +87,25 @@ object ComponentUtil {
      * 获取节点类型
      */
     fun getEntryType(field: Field, classLoader: ClassLoader = ReflectUtil.DefaultClassLoad) : Class<*>? {
-        return field.getAnnotation(EntryTypeByClass::class.java)?.value?.java
+        val entryType = when(field.type) {
+            BooleanEntry::class.java    -> Boolean::class.java
+            DoubleEntry::class.java     -> Double::class.java
+            FloatEntry::class.java      -> Float::class.java
+            IntEntry::class.java        -> Int::class.java
+            LongEntry::class.java       -> Long::class.java
+            ShortEntry::class.java      -> Short::class.java
+
+            StaticBooleanEntry::class.java  -> Boolean::class.java
+            StaticDoubleEntry::class.java   -> Double::class.java
+            StaticFloatEntry::class.java    -> Float::class.java
+            StaticIntEntry::class.java      -> Int::class.java
+            StaticLongEntry::class.java     -> Long::class.java
+            StaticShortEntry::class.java    -> Short::class.java
+
+            else -> null
+        }
+        return entryType ?:
+                field.getAnnotation(EntryTypeByClass::class.java)?.value?.java
                 ?:
                 field.getAnnotation(EntryTypeByString::class.java)?.value?.let {
                     ReflectUtil.loadClass(it, classLoader)
