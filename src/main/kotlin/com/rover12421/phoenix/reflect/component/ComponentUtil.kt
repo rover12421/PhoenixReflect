@@ -172,7 +172,7 @@ object ComponentUtil {
                     else -> null
                 }
                 field.isAccessible = true
-                field.set(this, obj)
+                field.set(initObj, obj)
             }
         }
     }
