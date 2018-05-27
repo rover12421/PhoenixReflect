@@ -2,8 +2,9 @@ package com.rover12421.phoenix.reflect.component.entry
 
 import java.lang.reflect.Method
 
-class StaticMethodEntry(@JvmField val method: Method) {
-    fun invoke(vararg args: Any?) : Any? {
-        return method.invoke(null, *args)
+@Suppress("UNCHECKED_CAST")
+class StaticMethodEntry<T>(@JvmField val method: Method) : AbsEntry<Method, T>(method) {
+    fun invoke(vararg args: Any?) : T {
+        return method.invoke(null, *args) as T
     }
 }

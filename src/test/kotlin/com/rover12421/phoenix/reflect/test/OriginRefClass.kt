@@ -12,14 +12,14 @@ import com.rover12421.phoenix.reflect.component.entry.StaticMethodEntry
 @FromClassByString("com.rover12421.phoenix.reflect.test.OriginClass")
 object OriginRefClass : BaseReflectComponent() {
     @EntryNames("S1", "s1")
-    var s: ObjectEntry? = null
+    var s: ObjectEntry<String>? = null
     var i1: IntEntry? = null
 
-    var say: MethodEntry? = null
-    var getS1: StaticMethodEntry? = null
+    var say: MethodEntry<Void>? = null
+    var getS1: StaticMethodEntry<String>? = null
 
     @ParameterTypesByClass(Int::class, String::class, Integer::class, Array<Any>::class)
-    private var test: MethodEntry? = null
+    private var test: MethodEntry<String>? = null
 
     fun test() {
         println(this)

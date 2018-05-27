@@ -2,7 +2,7 @@ package com.rover12421.phoenix.reflect.component.entry
 
 import java.lang.reflect.Field
 
-class StaticLongEntry(field: Field): FieldEntry(field) {
+class StaticLongEntry(field: Field): FieldEntry<Long>(field) {
     fun setValue(value: Long) {
         field.setLong(null, value)
     }

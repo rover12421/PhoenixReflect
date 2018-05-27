@@ -2,7 +2,7 @@ package com.rover12421.phoenix.reflect.component.entry
 
 import java.lang.reflect.Field
 
-class FloatEntry(field: Field): FieldEntry(field) {
+class FloatEntry(field: Field): FieldEntry<Float>(field) {
     fun setValue(from: Any, value: Float) {
         field.setFloat(from, value)
     }
