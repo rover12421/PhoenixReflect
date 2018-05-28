@@ -4,7 +4,7 @@ import com.rover12421.phoenix.reflect.exception.ReflectException
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Method
 
-class MethodAdaoter : BaseReflectAdapter() {
+class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
     private val methodNames: MutableList<String> = mutableListOf()
     private var returnType: Class<*>? = null
     private var fromObject: Any? = null
@@ -13,7 +13,10 @@ class MethodAdaoter : BaseReflectAdapter() {
 
     private var method: Method? = null
 
-    fun name(vararg value: String) : MethodAdaoter  {
+    fun methodName(vararg value: String, append: Boolean = false) : MethodAdaoter  {
+        if (!append) {
+            methodNames.clear()
+        }
         methodNames.addAll(value)
         return this
     }
@@ -23,12 +26,18 @@ class MethodAdaoter : BaseReflectAdapter() {
         return this
     }
 
-    fun parameterTypes(vararg cls: Class<*>?) : MethodAdaoter {
+    fun parameterTypes(vararg cls: Class<*>?, append: Boolean = false) : MethodAdaoter {
+        if (!append) {
+            parameterTypes.clear()
+        }
         parameterTypes.addAll(cls)
         return this
     }
 
-    fun invokeArgs(vararg args: Any?) : MethodAdaoter {
+    fun invokeArgs(vararg args: Any?, append: Boolean = false) : MethodAdaoter {
+        if (!append) {
+            invokeArgs.clear()
+        }
         invokeArgs.addAll(args)
         return this
     }

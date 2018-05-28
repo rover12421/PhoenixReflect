@@ -4,13 +4,16 @@ import com.rover12421.phoenix.reflect.exception.ReflectException
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Field
 
-class FieldAdapter : BaseReflectAdapter() {
+class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
     private val fieldNames: MutableList<String> = mutableListOf()
     private var type: Class<*>? = null
     private var fromObject: Any? = null
     private var field: Field? = null
 
-    fun name(vararg value: String) : FieldAdapter  {
+    fun fieldName(vararg value: String, append: Boolean = false) : FieldAdapter  {
+        if (!append) {
+            fieldNames.clear()
+        }
         fieldNames.addAll(value)
         return this
     }

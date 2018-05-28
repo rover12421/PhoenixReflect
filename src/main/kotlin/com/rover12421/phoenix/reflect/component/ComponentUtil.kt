@@ -146,7 +146,7 @@ object ComponentUtil {
                 val obj = when {
                     FieldEntry::class.java.isAssignableFrom(filedType) -> {
                         val f = com.rover12421.phoenix.reflect.adapter.field {
-                            name(*entryNames)
+                            fieldName(*entryNames)
                             type(entryType)
                             fromClass(*fromClass.toTypedArray())
                         }.toField()
@@ -155,7 +155,7 @@ object ComponentUtil {
                     filedType == MethodEntry::class.java ||
                             filedType == StaticMethodEntry::class.java -> {
                         val m = method {
-                            name(*entryNames)
+                            methodName(*entryNames)
                             returnType(entryType)
                             fromClass(*fromClass.toTypedArray())
                             parameterTypes(*parameterTypes)
