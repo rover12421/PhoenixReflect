@@ -9,11 +9,12 @@ class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
 
     private var constructor: Constructor<*>? = null
 
+    fun parameterTypes(vararg cls: Class<*>?) : ConstructorAdapter = parameterTypes(false, *cls)
     /**
      * 设置构造方法的参数类型
      * [append] 追加模式
      */
-    fun parameterTypes(vararg cls: Class<*>?, append: Boolean = false) : ConstructorAdapter {
+    fun parameterTypes(append: Boolean, vararg cls: Class<*>?) : ConstructorAdapter {
         if (!append) {
             parameterTypes.clear()
         }
@@ -21,11 +22,24 @@ class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
         return this
     }
 
+    fun parameterTypes(vararg classStr: String) : ConstructorAdapter = parameterTypes(true, *classStr)
+    fun parameterTypes(append: Boolean, vararg classStr: String) : ConstructorAdapter {
+        if (!append) {
+            parameterTypes.clear()
+        }
+        classStr.forEach {
+            parameterTypes.add(ReflectUtil.loadClass(it, classLoader))
+        }
+
+        return this
+    }
+
+    fun invokeArgs(vararg args: Any?) : ConstructorAdapter  = invokeArgs(false, args)
     /**
      * 设置构造方法所需参数
      * [append] 追加模式
      */
-    fun invokeArgs(vararg args: Any?, append: Boolean = false) : ConstructorAdapter {
+    fun invokeArgs(append: Boolean, vararg args: Any?) : ConstructorAdapter {
         if (!append) {
             invokeArgs.clear()
         }

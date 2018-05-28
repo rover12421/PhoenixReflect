@@ -10,7 +10,8 @@ class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
     private var fromObject: Any? = null
     private var field: Field? = null
 
-    fun fieldName(vararg value: String, append: Boolean = false) : FieldAdapter  {
+    fun fieldName(vararg value: String) : FieldAdapter = fieldName(false, *value)
+    fun fieldName(append: Boolean, vararg value: String) : FieldAdapter  {
         if (!append) {
             fieldNames.clear()
         }

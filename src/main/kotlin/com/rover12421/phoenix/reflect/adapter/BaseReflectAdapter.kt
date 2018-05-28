@@ -28,7 +28,8 @@ abstract class BaseReflectAdapter<T : BaseReflectAdapter<T>> {
     /**
      * 设置来源class，使用字符串模式
      */
-    fun fromClass(vararg classStr: String, append: Boolean = true) : T {
+    fun fromClass(vararg classStr: String) : T = fromClass(true, *classStr)
+    fun fromClass(append: Boolean, vararg classStr: String) : T {
         if (!append) {
             fromClass.clear()
         }
@@ -44,7 +45,8 @@ abstract class BaseReflectAdapter<T : BaseReflectAdapter<T>> {
     /**
      * 设置来源class
      */
-    fun fromClass(vararg clazz: Class<*>, append: Boolean = true) : T {
+    fun fromClass(vararg clazz: Class<*>) : T = fromClass(true, *clazz)
+    fun fromClass(append: Boolean, vararg clazz: Class<*>) : T {
         if (!append) {
             fromClass.clear()
         }

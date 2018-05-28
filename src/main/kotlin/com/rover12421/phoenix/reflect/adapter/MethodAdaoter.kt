@@ -13,7 +13,8 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
 
     private var method: Method? = null
 
-    fun methodName(vararg value: String, append: Boolean = false) : MethodAdaoter  {
+    fun methodName(vararg value: String) : MethodAdaoter = methodName(false, *value)
+    fun methodName(append: Boolean, vararg value: String) : MethodAdaoter  {
         if (!append) {
             methodNames.clear()
         }
@@ -26,7 +27,8 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
         return this
     }
 
-    fun parameterTypes(vararg cls: Class<*>?, append: Boolean = false) : MethodAdaoter {
+    fun parameterTypes(vararg cls: Class<*>?) : MethodAdaoter = parameterTypes(false, *cls)
+    fun parameterTypes(append: Boolean, vararg cls: Class<*>?) : MethodAdaoter {
         if (!append) {
             parameterTypes.clear()
         }
@@ -34,7 +36,19 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
         return this
     }
 
-    fun invokeArgs(vararg args: Any?, append: Boolean = false) : MethodAdaoter {
+    fun parameterTypes(vararg classStr: String) : MethodAdaoter = parameterTypes(false, *classStr)
+    fun parameterTypes(append: Boolean, vararg classStr: String) : MethodAdaoter {
+        if (!append) {
+            parameterTypes.clear()
+        }
+        classStr.forEach {
+            parameterTypes.add(ReflectUtil.loadClass(it, classLoader))
+        }
+        return this
+    }
+
+    fun invokeArgs(vararg args: Any?) : MethodAdaoter = invokeArgs(false, *args)
+    fun invokeArgs(append: Boolean, vararg args: Any?) : MethodAdaoter {
         if (!append) {
             invokeArgs.clear()
         }
