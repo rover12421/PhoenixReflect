@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.rover12421.phoenix:PhoenixReflect:1.0'
+    compile 'com.rover12421.phoenix:PhoenixReflect:1.2'
 }
 ```
 
