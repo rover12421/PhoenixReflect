@@ -4,7 +4,7 @@ public class OriginClass {
     static String s1 = "s1";
     public int i1 = 100;
 
-    private void say(String info) {
+    private static void say(String info) {
         System.out.println(info);
     }
 

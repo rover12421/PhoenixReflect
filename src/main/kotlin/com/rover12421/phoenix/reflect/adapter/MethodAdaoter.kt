@@ -4,59 +4,41 @@ import com.rover12421.phoenix.reflect.exception.ReflectException
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Method
 
-class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
-    private val methodNames: MutableList<String> = mutableListOf()
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+class MethodAdapter : BaseReflectAdapter<MethodAdapter>() {
+    private val methodNames: MutableSet<String> = mutableSetOf()
     private var returnType: Class<*>? = null
-    private var fromObject: Any? = null
     private var parameterTypes: MutableList<Class<*>?> = mutableListOf()
-    private val invokeArgs: MutableList<Any?> = mutableListOf()
 
     private var method: Method? = null
 
-    fun methodName(vararg value: String) : MethodAdaoter = methodName(false, *value)
-    fun methodName(append: Boolean, vararg value: String) : MethodAdaoter  {
-        if (!append) {
-            methodNames.clear()
-        }
-        methodNames.addAll(value)
-        return this
-    }
+    fun methodName(vararg value: String) : MethodAdapter = this.apply { methodNames.addAll(value) }
+    fun methodName(value: Collection<String>) : MethodAdapter = this.apply { methodNames.addAll(value) }
 
-    fun returnType(t: Class<*>?) : MethodAdaoter {
+    fun returnType(t: Class<*>?) : MethodAdapter {
         returnType = t
         return this
     }
 
-    fun parameterTypes(vararg cls: Class<*>?) : MethodAdaoter = parameterTypes(false, *cls)
-    fun parameterTypes(append: Boolean, vararg cls: Class<*>?) : MethodAdaoter {
-        if (!append) {
-            parameterTypes.clear()
-        }
+    fun parameterTypes(vararg cls: Class<*>?) : MethodAdapter = this.apply{
+        parameterTypes.clear()
         parameterTypes.addAll(cls)
-        return this
     }
 
-    fun parameterTypes(vararg classStr: String) : MethodAdaoter = parameterTypes(false, *classStr)
-    fun parameterTypes(append: Boolean, vararg classStr: String) : MethodAdaoter {
-        if (!append) {
-            parameterTypes.clear()
-        }
+    fun parameterTypes(cls: Collection<Class<*>?>) : MethodAdapter = this.apply{
+        parameterTypes.clear()
+        parameterTypes.addAll(cls)
+    }
+
+
+    fun parameterTypes(vararg classStr: String) : MethodAdapter = this.apply {
+        parameterTypes.clear()
         classStr.forEach {
             parameterTypes.add(ReflectUtil.loadClass(it, classLoader))
         }
-        return this
     }
 
-    fun invokeArgs(vararg args: Any?) : MethodAdaoter = invokeArgs(false, *args)
-    fun invokeArgs(append: Boolean, vararg args: Any?) : MethodAdaoter {
-        if (!append) {
-            invokeArgs.clear()
-        }
-        invokeArgs.addAll(args)
-        return this
-    }
-
-    fun returnType(typeStr: String) : MethodAdaoter {
+    fun returnType(typeStr: String) : MethodAdapter {
         try {
             returnType(ReflectUtil.loadClass(typeStr, classLoader))
         } catch (e: Throwable) {
@@ -65,21 +47,13 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
         return this
     }
 
-    fun fromObject(obj: Any) : MethodAdaoter {
-        fromObject = obj
-        return this
-    }
-
     override fun checkArgs() {
-        if (fromClass .isEmpty()) {
-            if (fromObject == null) {
-                throw ReflectException("没有设置Method来源Class")
-            }
-            fromClass.add(fromObject!!::class.java)
+        if (fromClasses .isEmpty()) {
+            throw ReflectException("没有设置 Method 来源 Class")
         }
 
         if (methodNames.isEmpty()) {
-            throw ReflectException("没有设置Methodd的名字")
+            throw ReflectException("没有设置 Method 的名字")
         }
     }
 
@@ -88,13 +62,19 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
             return
         }
 
-        checkArgs()
+
+        try {
+            checkArgs()
+        } catch (e: Throwable) {
+            exception(e)
+            return
+        }
 
         var exception: Throwable? = null
-        fromClass.firstOrNull{ clazz ->
+        fromClasses.firstOrNull{ clazz ->
             methodNames.firstOrNull { methodName ->
                 try {
-                    method = ReflectUtil.findMethodInClass(clazz, methodName, parameterTypes.toTypedArray(), invokeArgs.toTypedArray(), true, returnType)
+                    method = ReflectUtil.findMethodInClass(clazz, methodName, parameterTypes.toTypedArray(), null, true, returnType, lazyMode)
                     true
                 } catch (e: Throwable) {
                     exception = e
@@ -113,9 +93,17 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
         return method
     }
 
-    fun invoke() : Any? {
+    fun invokeStatic(vararg args: Any?) : Any? {
         return try {
-            toMethod()?.invoke(fromObject, *invokeArgs.toTypedArray())
+            toMethod()!!.invoke(null, *args)
+        } catch (e: Throwable) {
+            exception(e)
+            null
+        }
+    }
+    fun invoke(obj: Any?, vararg args: Any?) : Any? {
+        return try {
+            toMethod()!!.invoke(obj, *args)
         } catch (e: Throwable) {
             exception(e)
             null
@@ -123,4 +111,4 @@ class MethodAdaoter : BaseReflectAdapter<MethodAdaoter>() {
     }
 }
 
-fun method(init: MethodAdaoter.() -> Unit): MethodAdaoter = MethodAdaoter().apply(init)
+fun method(init: MethodAdapter.() -> Unit): MethodAdapter = MethodAdapter().apply(init)

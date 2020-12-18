@@ -1,6 +1,7 @@
 package com.rover12421.phoenix.reflect.component
 
 import com.rover12421.phoenix.reflect.adapter.constructor
+import com.rover12421.phoenix.reflect.adapter.field
 import com.rover12421.phoenix.reflect.adapter.method
 import com.rover12421.phoenix.reflect.component.annotation.*
 import com.rover12421.phoenix.reflect.component.entry.*
@@ -8,7 +9,7 @@ import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Field
 
 object ComponentUtil {
-    private val AllEntryClass = arrayOf(
+    @JvmStatic private val AllEntryClass = arrayOf(
             BooleanEntry::class.java,
             DoubleEntry::class.java,
             FloatEntry::class.java,
@@ -31,30 +32,26 @@ object ComponentUtil {
             StaticMethodEntry::class.java
     )
 
-    @JvmField val EntryConstructor = AllEntryClass.associateBy({it}, {it.constructors[0]})
+    @JvmField val entryConstructorMap = AllEntryClass.associateBy({it}, {it.constructors[0]})
 
     /**
      * 获取节点名
      */
-    fun getEntryNames(field: Field): Array<String> {
-        val names = mutableListOf<String>()
-        val annotation = field.getAnnotation(EntryNames::class.java)
-        if (annotation != null) {
-            names.addAll(annotation.value)
-        } else {
-            names.add(field.name)
-        }
-        return names.toTypedArray()
+    @JvmStatic
+    fun getEntryNames(field: Field): Collection<String> {
+        return field.getAnnotation(EntryNames::class.java)?.value?.toSet()?: setOf(field.name)
     }
+
+    @JvmStatic
+    fun isLazyMode(field: Field) = field.isAnnotationPresent(LazyMode::class.java)
 
     /**
      * 从字段[field]注解上获取来源Class(FromClass)
      */
-    fun getFromClassInField(field: Field, classLoader: ClassLoader = ReflectUtil.DefaultClassLoad): MutableList<Class<*>> {
+    @JvmStatic
+    fun getFromClassInField(field: Field, classLoader: ClassLoader? = ReflectUtil.getDefaultClassLoad()): MutableList<Class<*>> {
         val cls = mutableListOf<Class<*>>()
-        field.getAnnotation(FromClassByClass::class.java)?.apply {
-            cls.addAll(value.map { it.java })
-        }
+        field.getAnnotation(FromClassByClass::class.java)?.value?.forEach { cls.add(it.java) }
 
         field.getAnnotation(FromClassByString::class.java)?.value?.forEach {
             try {
@@ -68,18 +65,17 @@ object ComponentUtil {
     /**
      * 从定义类[defineClass]注解上获取来源Class(FromClass)
      */
-    fun getFromClassInClass(defineClass: Class<*>? = null, classLoader: ClassLoader = ReflectUtil.DefaultClassLoad): MutableList<Class<*>> {
+    @JvmStatic
+    fun getFromClassInClass(defineClass: Class<*>, classLoader: ClassLoader? = ReflectUtil.getDefaultClassLoad()): MutableList<Class<*>> {
         val cls = mutableListOf<Class<*>>()
-        if (defineClass != null) {
-            defineClass.getAnnotation(FromClassByClass::class.java)?.apply {
-                cls.addAll(value.map { it.java })
-            }
+        try {
+            defineClass.getAnnotation(FromClassByClass::class.java)?.value?.forEach { cls.add(it.java) }
+        } catch (_: Throwable){}
 
-            defineClass.getAnnotation(FromClassByString::class.java)?.value?.forEach {
-                try {
-                    cls.add(ReflectUtil.loadClass(it, classLoader))
-                } catch (_: Throwable) {}
-            }
+        defineClass.getAnnotation(FromClassByString::class.java)?.value?.forEach {
+            try {
+                cls.add(ReflectUtil.loadClass(it, classLoader))
+            } catch (_: Throwable) {}
         }
 
         return cls
@@ -88,7 +84,8 @@ object ComponentUtil {
     /**
      * 获取节点类型
      */
-    fun getEntryType(field: Field, classLoader: ClassLoader = ReflectUtil.DefaultClassLoad) : Class<*>? {
+    @JvmStatic
+    fun getEntryType(field: Field, classLoader: ClassLoader? = ReflectUtil.getDefaultClassLoad()) : Class<*>? {
         val entryType = when(field.type) {
             BooleanEntry::class.java    -> Boolean::class.java
             DoubleEntry::class.java     -> Double::class.java
@@ -107,24 +104,29 @@ object ComponentUtil {
             else -> null
         }
         return entryType ?:
-                field.getAnnotation(EntryTypeByClass::class.java)?.value?.java
-                ?:
-                field.getAnnotation(EntryTypeByString::class.java)?.value?.let {
-                    ReflectUtil.loadClass(it, classLoader)
-                }
+        field.getAnnotation(EntryTypeByClass::class.java)?.value?.java
+        ?:
+        field.getAnnotation(EntryTypeByString::class.java)?.value?.let {
+            ReflectUtil.loadClass(it, classLoader)
+        }
     }
 
-    fun getParameterTypes(field: Field, classLoader: ClassLoader = ReflectUtil.DefaultClassLoad) : MutableList<Class<*>?> {
+    @JvmStatic
+    fun getParameterTypes(field: Field, classLoader: ClassLoader? = ReflectUtil.getDefaultClassLoad()) : MutableList<Class<*>?> {
         val cls = mutableListOf<Class<*>?>()
-        field.getAnnotation(ParameterTypesByClass::class.java)?.apply {
-            cls.addAll(value.map { it.java })
-        }
+        field.getAnnotation(ParameterTypesByClass::class.java)?.value?.forEach { cls.add(it.java) }
 
-        field.getAnnotation(ParameterTypesByString::class.java)?.value?.forEach {
-            try {
-                cls.add(ReflectUtil.loadClass(it, classLoader))
-            } catch (_: Throwable) {
-                cls.add(null)
+        if (cls.isEmpty()) {
+            /**
+             * [ParameterTypesByClass] 和 [ParameterTypesByString] 同时使用
+             * [ParameterTypesByString] 无效
+             */
+            field.getAnnotation(ParameterTypesByString::class.java)?.value?.forEach {
+                try {
+                    cls.add(ReflectUtil.loadClass(it, classLoader))
+                } catch (_: Throwable) {
+                    cls.add(null)
+                }
             }
         }
         return cls
@@ -132,42 +134,56 @@ object ComponentUtil {
 
     fun initComponent(initObj: Any) {
         val clazz = initObj::class.java
-        val fromClass = ComponentUtil.getFromClassInClass(clazz)
+        val fromClasses = getFromClassInClass(clazz)
         clazz.declaredFields.forEach { field ->
             val filedType = field.type
-            val ctor = ComponentUtil.EntryConstructor[filedType]
+            val ctor = entryConstructorMap[filedType]
             if (ctor != null) {
-                fromClass.addAll(0, ComponentUtil.getFromClassInField(field))
+                val classes = getFromClassInField(field)
+                classes.addAll(fromClasses)
 
-                val entryNames = ComponentUtil.getEntryNames(field)
-                val entryType = ComponentUtil.getEntryType(field)
-                val parameterTypes = ComponentUtil.getParameterTypes(field).toTypedArray()
+                if (classes.isEmpty()) {
+                    /**
+                     * 没有来源 Class 说明找不到类，没有必要继续下去了
+                     */
+                    return@forEach
+                }
+
+                val entryNames = getEntryNames(field)
+                val entryType = getEntryType(field)
+                val parameterTypes = getParameterTypes(field)
+                val lazyMode = isLazyMode(field)
 
                 val obj = when {
                     FieldEntry::class.java.isAssignableFrom(filedType) -> {
-                        val f = com.rover12421.phoenix.reflect.adapter.field {
-                            fieldName(*entryNames)
+                        val f = field {
+                            fieldName(entryNames)
                             type(entryType)
-                            fromClass(*fromClass.toTypedArray())
+                            fromClass(classes)
+                            catchException(true)
                         }.toField()
-                        ctor.newInstance(f)
+                        f?.let { ctor.newInstance(f) }
                     }
                     filedType == MethodEntry::class.java ||
                             filedType == StaticMethodEntry::class.java -> {
                         val m = method {
-                            methodName(*entryNames)
+                            methodName(entryNames)
                             returnType(entryType)
-                            fromClass(*fromClass.toTypedArray())
-                            parameterTypes(*parameterTypes)
+                            fromClass(classes)
+                            parameterTypes(parameterTypes)
+                            catchException(true)
+                            lazyMode(lazyMode)
                         }.toMethod()
-                        ctor.newInstance(m)
+                        m?.let { ctor.newInstance(m) }
                     }
                     filedType == ConstructorEntry::class.java -> {
                         val c = constructor {
-                            fromClass(*fromClass.toTypedArray())
-                            parameterTypes(*parameterTypes)
+                            fromClass(classes)
+                            parameterTypes(parameterTypes)
+                            catchException(true)
+                            lazyMode(lazyMode)
                         }.toConstructor()
-                        ctor.newInstance(c)
+                        c?.let { ctor.newInstance(c) }
                     }
                     else -> null
                 }

@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.rover12421.phoenix:PhoenixReflect:1.4'
+    compile 'com.rover12421.phoenix:PhoenixReflect:3.0'
 }
 ```
 
@@ -89,4 +89,19 @@ s1
 hhhh
 s1
 i1=123, str=kkk, i2=456, any=[, 11111, com.rover12421.phoenix.reflect.test.OriginRefClass@37a71e93, com.rover12421.phoenix.reflect.test.OriginClass@7e6cbb7a]
+```
+
+试试另一种风格
+```kotlin
+        field {
+            fieldName("S1", "s1")
+            fromClass(OriginClass::class.java)
+            catchException(true)
+        }.getValue(OriginClass()).apply { println(this) }
+
+        method {
+            methodName("say")
+            fromClass("com.rover12421.phoenix.reflect.test.OriginClass")
+            lazyMode(true)
+        }.invokeStatic("this is a static method!")
 ```

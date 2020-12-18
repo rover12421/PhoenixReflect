@@ -3,48 +3,37 @@ package com.rover12421.phoenix.reflect.adapter
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Constructor
 
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
     private var parameterTypes: MutableList<Class<*>?> = mutableListOf()
-    private val invokeArgs: MutableList<Any?> = mutableListOf()
 
-    private var constructor: Constructor<*>? = null
+    private var ctor: Constructor<*>? = null
 
-    fun parameterTypes(vararg cls: Class<*>?) : ConstructorAdapter = parameterTypes(false, *cls)
     /**
      * 设置构造方法的参数类型
-     * [append] 追加模式
      */
-    fun parameterTypes(append: Boolean, vararg cls: Class<*>?) : ConstructorAdapter {
-        if (!append) {
-            parameterTypes.clear()
-        }
+    fun parameterTypes(vararg cls: Class<*>?) : ConstructorAdapter = this.apply {
+        parameterTypes.clear()
         parameterTypes.addAll(cls)
-        return this
     }
 
-    fun parameterTypes(vararg classStr: String) : ConstructorAdapter = parameterTypes(true, *classStr)
-    fun parameterTypes(append: Boolean, vararg classStr: String) : ConstructorAdapter {
-        if (!append) {
-            parameterTypes.clear()
-        }
+    fun parameterTypes(cls: Collection<Class<*>?>) : ConstructorAdapter = this.apply {
+        parameterTypes.clear()
+        parameterTypes.addAll(cls)
+    }
+
+    fun parameterTypes(vararg classStr: String) : ConstructorAdapter = this.apply{
+        parameterTypes.clear()
         classStr.forEach {
             parameterTypes.add(ReflectUtil.loadClass(it, classLoader))
         }
-
-        return this
     }
 
-    fun invokeArgs(vararg args: Any?) : ConstructorAdapter  = invokeArgs(false, args)
-    /**
-     * 设置构造方法所需参数
-     * [append] 追加模式
-     */
-    fun invokeArgs(append: Boolean, vararg args: Any?) : ConstructorAdapter {
-        if (!append) {
-            invokeArgs.clear()
+    fun parameterTypesByStr(classStr: Collection<String>) : ConstructorAdapter = this.apply {
+        parameterTypes.clear()
+        classStr.forEach {
+            parameterTypes.add(ReflectUtil.loadClass(it, classLoader))
         }
-        invokeArgs.addAll(args)
-        return this
     }
 
     override fun checkArgs() {
@@ -52,16 +41,21 @@ class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
     }
 
     private fun checkConstruct() {
-        if (constructor != null) {
+        if (ctor != null) {
             return
         }
 
-        checkArgs()
+        try {
+            checkArgs()
+        } catch (e: Throwable) {
+            exception(e)
+            return
+        }
 
         var exception: Throwable? = null
-        fromClass.firstOrNull{ clazz ->
+        fromClasses.firstOrNull{ clazz ->
             try {
-                constructor = ReflectUtil.findConstructorInClass(clazz, parameterTypes.toTypedArray(), invokeArgs.toTypedArray())
+                ctor = ReflectUtil.findConstructorInClass(clazz, parameterTypes.toTypedArray(), null, lazyMode)
                 true
             } catch (e: Throwable) {
                 exception = e
@@ -69,7 +63,7 @@ class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
             }
         }
 
-        if (constructor == null) {
+        if (ctor == null) {
             exception(exception)
         }
     }
@@ -79,15 +73,15 @@ class ConstructorAdapter : BaseReflectAdapter<ConstructorAdapter>() {
      */
     fun toConstructor() : Constructor<*>? {
         checkConstruct()
-        return constructor
+        return ctor
     }
 
     /**
      * 获取构造方法的新实例
      */
-    fun newInstance() : Any? {
+    fun newInstance(vararg args: Any?) : Any? {
         return try {
-            toConstructor()?.newInstance(*invokeArgs.toTypedArray())
+            toConstructor()!!.newInstance(*args)
         } catch (e: Throwable) {
             exception(e)
             null

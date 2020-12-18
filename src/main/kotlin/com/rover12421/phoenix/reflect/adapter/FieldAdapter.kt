@@ -4,20 +4,14 @@ import com.rover12421.phoenix.reflect.exception.ReflectException
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 import java.lang.reflect.Field
 
+@Suppress("MemberVisibilityCanBePrivate")
 class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
-    private val fieldNames: MutableList<String> = mutableListOf()
+    private val fieldNames: MutableSet<String> = mutableSetOf()
     private var type: Class<*>? = null
-    private var fromObject: Any? = null
     private var field: Field? = null
 
-    fun fieldName(vararg value: String) : FieldAdapter = fieldName(false, *value)
-    fun fieldName(append: Boolean, vararg value: String) : FieldAdapter  {
-        if (!append) {
-            fieldNames.clear()
-        }
-        fieldNames.addAll(value)
-        return this
-    }
+    fun fieldName(vararg value: String) : FieldAdapter = this.apply { fieldNames.addAll(value) }
+    fun fieldName(value: Collection<String>) : FieldAdapter = this.apply { fieldNames.addAll(value) }
 
     fun type(t: Class<*>?) : FieldAdapter {
         type = t
@@ -33,17 +27,9 @@ class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
         return this
     }
 
-    fun fromObject(obj: Any) : FieldAdapter {
-        fromObject = obj
-        return this
-    }
-
     override fun checkArgs() {
-        if (fromClass .isEmpty()) {
-            if (fromObject == null) {
-                throw ReflectException("没有设置Field来源Class")
-            }
-            fromClass.add(fromObject!!::class.java)
+        if (fromClasses .isEmpty()) {
+            throw ReflectException("没有设置Field来源Class")
         }
 
         if (fieldNames.isEmpty()) {
@@ -56,10 +42,15 @@ class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
             return
         }
 
-        checkArgs()
+        try {
+            checkArgs()
+        } catch (e: Throwable) {
+            exception(e)
+            return
+        }
 
         var exception: Throwable? = null
-        fromClass.firstOrNull{ clazz ->
+        fromClasses.firstOrNull{ clazz ->
             fieldNames.firstOrNull { fieldName ->
                 try {
                     field = ReflectUtil.findFieldInClass(clazz, fieldName, true, type)
@@ -81,32 +72,23 @@ class FieldAdapter : BaseReflectAdapter<FieldAdapter>() {
         return field
     }
 
-    fun setValue(value: Any?) : FieldAdapter {
+    fun setValue(value: Any?) : FieldAdapter = setValue(null, value)
+    fun setValue(obj: Any?, value: Any?) : FieldAdapter {
         try {
-            toField()?.set(fromObject, value)
+            toField()!!.set(obj, value)
         } catch (e: Throwable) {
             exception(e)
         }
         return this
     }
 
-    fun setValue(obj: Any, value: Any?) : FieldAdapter {
-        fromObject(obj)
-        return setValue(value)
-    }
-
-    fun getValue() : Any? {
+    fun getValue(obj: Any? = null) : Any? {
         return try {
-            toField()?.get(fromObject)
+            toField()!!.get(obj)
         } catch (e: Throwable) {
             exception(e)
             null
         }
-    }
-
-    fun getValue(obj: Any) : Any? {
-        fromObject(obj)
-        return getValue()
     }
 }
 

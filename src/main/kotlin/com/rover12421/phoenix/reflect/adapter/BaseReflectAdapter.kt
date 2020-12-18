@@ -2,17 +2,27 @@ package com.rover12421.phoenix.reflect.adapter
 
 import com.rover12421.phoenix.reflect.util.ReflectUtil
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate")
 abstract class BaseReflectAdapter<T : BaseReflectAdapter<T>> {
-    @JvmField protected var fromClass: MutableList<Class<*>> = mutableListOf()
+    @JvmField protected var fromClasses: MutableList<Class<*>> = mutableListOf()
     @JvmField protected var catchException: Boolean = false
-    @JvmField protected var classLoader: ClassLoader = ReflectUtil.DefaultClassLoad
+    @JvmField protected var classLoader: ClassLoader? = ReflectUtil.getDefaultClassLoad()
+    @JvmField protected var lazyMode = false
 
     /**
      * 设置ClassLoad
      */
-    fun classLoader(cl: ClassLoader) : T {
+    fun classLoader(cl: ClassLoader?) : T {
         classLoader = cl
+        return this as T
+    }
+
+    /**
+     * 设置 懒人模式
+     * Field 无效
+     */
+    fun lazyMode(lazyMode: Boolean) : T {
+        this.lazyMode = lazyMode
         return this as T
     }
 
@@ -28,30 +38,31 @@ abstract class BaseReflectAdapter<T : BaseReflectAdapter<T>> {
     /**
      * 设置来源class，使用字符串模式
      */
-    fun fromClass(vararg classStr: String) : T = fromClass(true, *classStr)
-    fun fromClass(append: Boolean, vararg classStr: String) : T {
-        if (!append) {
-            fromClass.clear()
-        }
+    fun fromClass(vararg classStr: String) : T = (this as T).apply {
         classStr.forEach {
             try {
-                fromClass.add(ReflectUtil.loadClass(it, classLoader))
+                fromClasses.add(ReflectUtil.loadClass(it, classLoader))
             } catch (_: Throwable){}
         }
+    }
 
-        return this as T
+    fun fromClassStr(classStrs: Collection<String>) : T = (this as T).apply {
+        classStrs.forEach {
+            try {
+                fromClasses.add(ReflectUtil.loadClass(it, classLoader))
+            } catch (_: Throwable){}
+        }
     }
 
     /**
      * 设置来源class
      */
-    fun fromClass(vararg clazz: Class<*>) : T = fromClass(true, *clazz)
-    fun fromClass(append: Boolean, vararg clazz: Class<*>) : T {
-        if (!append) {
-            fromClass.clear()
-        }
-        fromClass.addAll(clazz)
-        return this as T
+    fun fromClass(vararg clazz: Class<*>) : T = (this as T).apply{
+        fromClasses.addAll(clazz)
+    }
+
+    fun fromClass(clazz: Collection<Class<*>>) : T = (this as T).apply{
+        fromClasses.addAll(clazz)
     }
 
     protected fun exception(e: Throwable? = null) {
